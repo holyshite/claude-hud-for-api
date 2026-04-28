@@ -1,0 +1,23 @@
+{
+  "name": "claude-token-hud-marketplace",
+  "displayName": "Claude Token HUD Marketplace",
+  "description": "Marketplace for Claude Token HUD plugin",
+  "version": "0.1.0",
+  "owner": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "metadata": {
+    "description": "Real-time token usage and model information HUD for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "claude-token-hud",
+      "source": "./",
+      "description": "Real-time token usage and model information HUD for Claude Code",
+      "category": "monitoring",
+      "tags": ["hud", "tokens", "monitoring", "statusline"]
+    }
+  ]
+}
