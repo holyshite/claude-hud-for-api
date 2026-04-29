@@ -1,223 +1,91 @@
 ---
-description: 查看并编辑 HUD 显示选项、颜色和格式配置
-allowed-tools: Read, Write, Bash
+description: 交互式配置 HUD 显示选项、颜色和格式
+allowed-tools: Read, Write
 ---
 
-# 配置Claude Token HUD插件
+# 配置 Claude HUD
 
-此命令帮助您配置Claude Token HUD插件的显示选项、颜色主题和格式设置。
+交互式配置 HUD 插件，无需手动编辑 JSON。
 
-## 配置位置
+## 你的任务
 
-插件配置文件位于：
-```
-~/.claude/plugins/claude-hud/config.json
-```
+### Step 1: 读取当前配置
 
-## 配置选项
+Read `~/.claude/plugins/claude-hud/config.json`。如果文件不存在，说明插件尚未初始化，提醒用户先运行 `/claude-hud:setup`。
 
-### 显示设置 (display)
+### Step 2: 展示当前配置和可选菜单
 
-```json
-{
-  "display": {
-    "layout": "compact",           // 布局模式: "compact"（紧凑）或 "detailed"（详细）
-    "showModel": true,            // 显示模型名称
-    "showContextBar": true,       // 显示上下文进度条
-    "showTokenCounts": false,     // 显示详细token计数
-    "showRateLimits": true,       // 显示速率限制
-    "showSeparators": true,       // 显示分隔符（|）
-    "compactNumbers": true        // 使用k/M单位格式化大数字
-  }
-}
-```
+用 AskUserQuestion 让用户选择要配置的模块：
 
-### 颜色设置 (colors)
+1. **显示设置** — 布局、显示开关、token 分解等
+2. **颜色主题** — 阈值颜色、模型名称颜色、进度条样式
+3. **格式设置** — 模型名称格式、百分比精度
+4. **Git 状态** — 显示分支、脏标记等
+5. **恢复默认** — 删除配置文件，恢复出厂设置
 
-```json
-{
-  "colors": {
-    "safeThreshold": 70,          // 安全阈值（百分比），低于此值为绿色
-    "warningThreshold": 90,       // 警告阈值（百分比），高于此值为红色
-    "modelColor": "cyan",         // 模型名称颜色
-    "progressStyle": "bar"        // 进度条样式: "bar"（条形）| "text"（文本）| "percentage"（百分比）
-  }
-}
-```
+### Step 3: 根据选择进行配置
 
-### 格式设置 (format)
+#### 如果选了「显示设置」：
 
-```json
-{
-  "format": {
-    "modelFormat": "{name}",      // 模型显示格式，支持 {name} 和 {id}
-    "percentagePrecision": 0      // 百分比小数位数（0-3）
-  }
-}
-```
+先展示当前 display 配置，然后询问用户想修改哪些项。可配置项及说明：
 
-## 配置示例
+| 字段 | 当前值 | 说明 | 可选值 |
+|------|--------|------|--------|
+| `lineLayout` | — | 布局模式 | `compact`（紧凑单行）、`expanded`（多行展开）、`detailed`（经典详细） |
+| `showSeparators` | — | 各区块间用 `\|` 分隔 | `true` / `false` |
+| `showModel` | — | 显示模型名称 | `true` / `false` |
+| `showContextBar` | — | 显示上下文进度条 | `true` / `false` |
+| `contextValue` | — | 上下文数值显示模式 | `percent`（百分比）、`tokens`（绝对数）、`both`（百分比+绝对数）、`remaining`（剩余百分比） |
+| `showTokenCounts` | — | 显示输入/输出/总计 token | `true` / `false` |
+| `showTokenBreakdown` | — | 显示 token 分类（in/cache） | `true` / `false` |
+| `compactNumbers` | — | 大数字用 k/M 单位 | `true` / `false` |
+| `showDuration` | — | 显示会话时长 | `true` / `false` |
+| `showSpeed` | — | 显示 token 生成速率 | `true` / `false` |
+| `showUsage` | — | 显示 API 速率限制（5h/7d） | `true` / `false` |
+| `usageBarEnabled` | — | 速率限制进度条 | `true` / `false` |
+| `usageThreshold` | — | 速率限制警告阈值（0-100） | 数字 |
+| `showSessionTokens` | — | 显示会话累计 token | `true` / `false` |
+| `showSessionName` | — | 显示会话名称 | `true` / `false` |
 
-### 示例1：紧凑模式（默认）
-```json
-{
-  "display": {
-    "layout": "compact",
-    "showModel": true,
-    "showContextBar": true,
-    "showTokenCounts": false,
-    "showRateLimits": true,
-    "showSeparators": true,
-    "compactNumbers": true
-  },
-  "colors": {
-    "safeThreshold": 70,
-    "warningThreshold": 90,
-    "modelColor": "cyan",
-    "progressStyle": "bar"
-  },
-  "format": {
-    "modelFormat": "{name}",
-    "percentagePrecision": 0
-  }
-}
-```
+AskUserQuestion 每次最多 4 个选项，分多次询问或让用户在回答中自由描述想改什么。
 
-显示效果：
-```
-[Claude Opus 4.6] [████░░░░░░ 42% (84k/200k)] [5h: 15%] [7d: 3%]
-```
+用户说明要改的项后，使用 Edit 工具更新 config.json 中对应字段。
 
-### 示例2：详细模式
-```json
-{
-  "display": {
-    "layout": "detailed",
-    "showModel": true,
-    "showContextBar": true,
-    "showTokenCounts": true,
-    "showRateLimits": true,
-    "showSeparators": true,
-    "compactNumbers": true
-  }
-}
-```
+#### 如果选了「颜色主题」：
 
-显示效果：
-```
-Claude Opus 4.6
-Context: 84k/200k (42%) ★
-5h: 15% | 7d: 3%
-In: 45k | Out: 39k | Total: 84k
-```
+先展示当前 color 配置，然后询问用户想修改的项：
 
-### 示例3：最小模式
-```json
-{
-  "display": {
-    "layout": "compact",
-    "showModel": true,
-    "showContextBar": true,
-    "showTokenCounts": false,
-    "showRateLimits": false,
-    "showSeparators": false,
-    "compactNumbers": false
-  },
-  "colors": {
-    "progressStyle": "percentage"
-  }
-}
-```
+| 字段 | 当前值 | 说明 | 可选值 |
+|------|--------|------|--------|
+| `safeThreshold` | — | 安全阈值（绿色） | 0–100 |
+| `warningThreshold` | — | 警告阈值（红色） | 0–100 |
+| `modelColor` | — | 模型名称颜色 | `green`、`yellow`、`red`、`cyan`、`blue`、`magenta`、`dim` |
+| `progressStyle` | — | 进度条样式 | `bar`（条形 `████`）、`text`（纯文本）、`percentage`（仅百分比） |
 
-显示效果：
-```
-Claude Opus 4.6 42% (84,000/200,000)
-```
+#### 如果选了「格式设置」：
 
-## 可用颜色
+先展示当前 format 配置，然后询问用户想修改的项：
 
-模型名称支持以下颜色：
-- `green` - 绿色
-- `yellow` - 黄色
-- `red` - 红色
-- `cyan` - 青色（默认）
-- `blue` - 蓝色
-- `magenta` - 洋红色
-- `dim` - 暗淡色
+| 字段 | 当前值 | 说明 | 可选值 |
+|------|--------|------|--------|
+| `modelFormat` | — | 模型名称格式，支持 `{name}`（显示名）、`{id}`（模型 ID） | 字符串 |
+| `percentagePrecision` | — | 百分比小数位数 | 0–3 |
 
-## 手动编辑配置
+#### 如果选了「Git 状态」：
 
-您也可以手动编辑配置文件：
+先展示当前 gitStatus 配置，然后询问用户想修改的项：
 
-```bash
-# 编辑配置文件
-nano ~/.claude/plugins/claude-hud/config.json
+| 字段 | 当前值 | 说明 | 可选值 |
+|------|--------|------|--------|
+| `enabled` | — | 启用 Git 状态显示 | `true` / `false` |
+| `showDirty` | — | 显示工作区脏标记 | `true` / `false` |
+| `showAheadBehind` | — | 显示 ahead/behind 提交数 | `true` / `false` |
+| `showFileStats` | — | 显示文件变更统计（M/A/D/U） | `true` / `false` |
 
-# 或者使用您喜欢的编辑器
-code ~/.claude/plugins/claude-hud/config.json
-```
+#### 如果选了「恢复默认」：
 
-编辑后，保存文件并重启Claude Code即可生效。
+Delete `~/.claude/plugins/claude-hud/config.json`。插件下次运行时会自动创建新的默认配置文件。
 
-## 恢复默认配置
+### Step 4: 确认结果
 
-要恢复默认配置，只需删除配置文件：
-
-```bash
-rm ~/.claude/plugins/claude-hud/config.json
-```
-
-重启Claude Code后，插件会自动创建新的默认配置文件。
-
-## 配置验证
-
-插件会自动验证配置文件的格式和有效性。如果发现无效配置，会使用默认值替代并显示警告。
-
-常见验证规则：
-- 百分比阈值必须在0-100之间
-- 颜色名称必须是预定义的颜色之一
-- 布局模式必须是"compact"或"detailed"
-- 进度条样式必须是"bar"、"text"或"percentage"
-
-## 故障排除
-
-### 配置不生效
-- 确保配置文件路径正确
-- 检查JSON格式是否正确
-- 重启Claude Code
-
-### 配置错误导致插件失败
-- 插件会自动回退到默认配置
-- 检查终端中的错误信息
-- 删除配置文件重新配置
-
-### 终端颜色问题
-- 如果终端不支持ANSI颜色，颜色设置可能无效
-- 考虑使用`dim`颜色或禁用颜色
-
-## 高级配置
-
-### 自定义模型格式
-您可以使用`{name}`和`{id}`占位符自定义模型显示格式：
-
-```json
-{
-  "format": {
-    "modelFormat": "Model: {name} ({id})"
-  }
-}
-```
-
-### 调整更新频率
-在`~/.claude/settings.json`中调整`interval`值（毫秒）：
-
-```json
-{
-  "statusLine": {
-    "interval": 500  // 每500ms更新一次
-  }
-}
-```
-
-### 禁用插件
-要临时禁用插件，可以在`~/.claude/settings.json`中注释掉或移除`statusLine`配置。
+修改完成后，告知用户修改了哪些字段，并提醒重启 Claude Code 或运行 `/reload-plugins` 使配置生效。

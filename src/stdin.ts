@@ -252,6 +252,24 @@ export function getUsageFromStdin(stdin: StdinData): UsageData | null {
 }
 
 /**
+ * Format duration from milliseconds to human-readable string
+ */
+function formatDuration(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+  return `${seconds}s`;
+}
+
+/**
  * Extract and format all HUD data from stdin
  */
 export function extractHudData(stdin: StdinData): HudData {
@@ -277,6 +295,13 @@ export function extractHudData(stdin: StdinData): HudData {
   // 提取使用量数据
   const usageData = getUsageFromStdin(stdin);
 
+  // 提取会话时长
+  let sessionDuration: string | undefined;
+  const durationMs = stdin.cost?.total_duration_ms;
+  if (typeof durationMs === 'number' && durationMs > 0) {
+    sessionDuration = formatDuration(durationMs);
+  }
+
   return {
     modelName,
     modelId: stdin.model?.id,
@@ -285,7 +310,7 @@ export function extractHudData(stdin: StdinData): HudData {
     contextPercentage,
     hasNativePercentage,
     sessionTokens: undefined,
-    sessionDuration: undefined,
+    sessionDuration,
     gitStatus: undefined,
     usageData,
   };
