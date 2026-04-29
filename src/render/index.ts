@@ -8,121 +8,209 @@ export { renderModelLine } from './model-line';
 export { renderTokenLine } from './token-line';
 export { renderContextBar } from './context-bar';
 
+const UNKNOWN_TERMINAL_WIDTH = 80;
+
 /**
- * 渲染完整HUD状态行
+ * 获取终端宽度
  */
-export function renderHud(data: HudData, config: HudConfig): string {
+function getTerminalWidth(): number {
+  const stdoutColumns = (process.stdout as { columns?: number })?.columns;
+  if (typeof stdoutColumns === 'number' && Number.isFinite(stdoutColumns) && stdoutColumns > 0) {
+    return Math.floor(stdoutColumns);
+  }
+  const stderrColumns = (process.stderr as { columns?: number })?.columns;
+  if (typeof stderrColumns === 'number' && Number.isFinite(stderrColumns) && stderrColumns > 0) {
+    return Math.floor(stderrColumns);
+  }
+  const envColumns = Number.parseInt(process.env.COLUMNS ?? '', 10);
+  if (Number.isFinite(envColumns) && envColumns > 0) {
+    return envColumns;
+  }
+  return UNKNOWN_TERMINAL_WIDTH;
+}
+
+// eslint-disable-next-line no-control-regex
+const ANSI_ESCAPE_GLOBAL = /(?:\x1b\[[0-9;]*m|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\))/g;
+
+function stripAnsi(str: string): string {
+  return str.replace(ANSI_ESCAPE_GLOBAL, '');
+}
+
+function visualLength(str: string): number {
+  // 简化版：仅用于截断判断，支持 ANSI
+  return stripAnsi(str).length;
+}
+
+/**
+ * 截断字符串到指定可视宽度
+ */
+function truncateToWidth(str: string, maxWidth: number): string {
+  if (maxWidth <= 0 || visualLength(str) <= maxWidth) {
+    return str;
+  }
+  const suffix = maxWidth >= 3 ? '...' : '.'.repeat(maxWidth);
+  const keep = Math.max(0, maxWidth - suffix.length);
+  // 简单按字符截断（忽略 ANSI 码）
+  const clean = stripAnsi(str);
+  return clean.slice(0, keep) + suffix;
+}
+
+/**
+ * 渲染紧凑模式：所有主要信息在一行
+ */
+function renderCompact(data: HudData, config: HudConfig): string[] {
+  const lines: string[] = [];
+  const parts: string[] = [];
+
+  const modelLine = renderModelLine(data, config);
+  if (modelLine) parts.push(modelLine);
+
+  const contextBar = renderContextBar(data, config);
+  if (contextBar) parts.push(contextBar);
+
+  const tokenLine = renderTokenLine(data, config);
+  if (tokenLine) parts.push(tokenLine);
+
+  // 会话时长
+  if (config.display.showDuration && data.sessionDuration) {
+    parts.push(`⏱️ ${data.sessionDuration}`);
+  }
+
+  const separator = config.display.showSeparators ? ' | ' : ' ';
+  lines.push(parts.join(separator));
+  return lines;
+}
+
+/**
+ * 收集活动行（tools、agents、todos）
+ */
+function collectActivityLines(data: HudData, config: HudConfig): string[] {
+  const lines: string[] = [];
+  // 目前源码尚未实现 tools/agents/todos 追踪，预留接口
+  return lines;
+}
+
+/**
+ * 渲染展开模式：按语义行拆分
+ */
+function renderExpanded(data: HudData, config: HudConfig): string[] {
   const lines: string[] = [];
 
-  // 根据布局模式决定渲染顺序
-  if (config.display.layout === 'compact') {
-    // 紧凑模式：所有内容在一行
-    const parts: string[] = [];
+  // 身份行：模型名称
+  const modelLine = renderModelLine(data, config);
+  if (modelLine) lines.push(modelLine);
 
-    // 模型名称
-    const modelLine = renderModelLine(data, config);
-    if (modelLine) {
-      parts.push(modelLine);
-    }
+  // 上下文行
+  const contextBar = renderContextBar(data, config);
+  if (contextBar) lines.push(contextBar);
 
-    // 上下文条
-    const contextBar = renderContextBar(data, config);
-    if (contextBar) {
-      parts.push(contextBar);
-    }
-
-    // token计数（如果启用）
-    const tokenLine = renderTokenLine(data, config);
-    if (tokenLine) {
-      parts.push(tokenLine);
-    }
-
-    // 使用分隔符连接所有部分
-    const separator = config.display.showSeparators ? ' | ' : ' ';
-    lines.push(parts.join(separator));
-  } else {
-    // 详细模式：多行显示
-    const modelLine = renderModelLine(data, config);
-    if (modelLine) {
-      lines.push(modelLine);
-    }
-
-    const contextBar = renderContextBar(data, config);
-    if (contextBar) {
-      lines.push(contextBar);
-    }
-
-    const tokenLine = renderTokenLine(data, config);
-    if (tokenLine) {
-      lines.push(tokenLine);
+  // 使用量行（预留）
+  if (config.display.showUsage && data.usageData) {
+    // 简单显示
+    const usage = data.usageData;
+    if (usage.fiveHour !== null) {
+      lines.push(`usage: ${usage.fiveHour}%`);
     }
   }
 
-  // 过滤空行并连接
+  // 会话 token 行
+  if (config.display.showSessionTokens && data.sessionTokens) {
+    const st = data.sessionTokens;
+    const total = st.inputTokens + st.outputTokens + st.cacheCreationTokens + st.cacheReadTokens;
+    if (total > 0) {
+      const fmt = (n: number) => {
+        if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+        if (n >= 1000) return `${(n / 1000).toFixed(0)}k`;
+        return n.toString();
+      };
+      const parts = [`i:${fmt(st.inputTokens)}`, `o:${fmt(st.outputTokens)}`];
+      if (st.cacheCreationTokens > 0 || st.cacheReadTokens > 0) {
+        parts.push(`c:${fmt(st.cacheCreationTokens + st.cacheReadTokens)}`);
+      }
+      lines.push(`T ${fmt(total)} (${parts.join(', ')})`);
+    }
+  }
+
+  // 会话时长
+  if (config.display.showDuration && data.sessionDuration) {
+    lines.push(`⏱️ ${data.sessionDuration}`);
+  }
+
+  return lines;
+}
+
+/**
+ * 渲染完整 HUD 状态行
+ */
+export function renderHud(data: HudData, config: HudConfig): string {
+  const lines: string[] = [];
+  const lineLayout = config.display.lineLayout;
+
+  if (lineLayout === 'compact') {
+    const headerLines = renderCompact(data, config);
+    const activityLines = collectActivityLines(data, config);
+    lines.push(...headerLines);
+    if (config.display.showSeparators && activityLines.length > 0) {
+      const maxWidth = Math.max(...headerLines.map(visualLength), 20);
+      lines.push('─'.repeat(maxWidth));
+    }
+    lines.push(...activityLines);
+  } else if (lineLayout === 'expanded') {
+    const expandedLines = renderExpanded(data, config);
+    lines.push(...expandedLines);
+    // 活动行
+    const activityLines = collectActivityLines(data, config);
+    if (config.display.showSeparators && activityLines.length > 0 && expandedLines.length > 0) {
+      const maxWidth = Math.max(...expandedLines.map(visualLength), 20);
+      lines.push('─'.repeat(maxWidth));
+    }
+    lines.push(...activityLines);
+  } else {
+    // detailed：向后兼容
+    const modelLine = renderModelLine(data, config);
+    if (modelLine) lines.push(modelLine);
+
+    const contextBar = renderContextBar(data, config);
+    if (contextBar) lines.push(contextBar);
+
+    const tokenLine = renderTokenLine(data, config);
+    if (tokenLine) lines.push(tokenLine);
+  }
+
   const nonEmptyLines = lines.filter(line => line.trim().length > 0);
   return nonEmptyLines.join('\n');
 }
 
 /**
- * 计算终端宽度并调整渲染
+ * 自适应渲染（考虑终端宽度）
  */
-export function renderAdaptiveHud(data: HudData, config: HudConfig, terminalWidth: number = 80): string {
+export function renderAdaptiveHud(data: HudData, config: HudConfig, terminalWidth?: number): string {
+  const tw = terminalWidth ?? getTerminalWidth();
   const baseOutput = renderHud(data, config);
 
-  // 如果终端宽度未知或足够宽，直接返回
-  if (terminalWidth <= 0 || terminalWidth >= 100) {
+  if (tw <= 0) {
     return baseOutput;
   }
 
-  // 简单截断：如果输出太长，切换到紧凑模式
   const lines = baseOutput.split('\n');
-  if (lines.length === 1 && lines[0].length <= terminalWidth) {
-    return baseOutput;
-  }
-
-  // 如果太宽，尝试切换到紧凑模式
-  if (config.display.layout === 'detailed') {
-    const compactConfig = { ...config, display: { ...config.display, layout: 'compact' as 'compact' } };
-    const compactOutput = renderHud(data, compactConfig);
-    const compactLines = compactOutput.split('\n');
-
-    if (compactLines.length === 1 && compactLines[0].length <= terminalWidth) {
-      return compactOutput;
+  // 如果在 expanded 模式下太长，强制切到 compact
+  if (config.display.lineLayout === 'expanded' || config.display.lineLayout === 'detailed') {
+    if (lines.some(line => visualLength(line) > tw)) {
+      const compactConfig = {
+        ...config,
+        display: { ...config.display, lineLayout: 'compact' as const, showSeparators: false },
+      };
+      return renderHud(data, compactConfig);
     }
   }
 
-  // 如果仍然太宽，尝试进一步简化
-  const simplifiedConfig = {
-    ...config,
-    display: {
-      ...config.display,
-      layout: 'compact' as 'compact',
-      showTokenCounts: false,
-      showSeparators: false,
-    },
-  };
-  const simplifiedOutput = renderHud(data, simplifiedConfig);
-  const simplifiedLines = simplifiedOutput.split('\n');
+  // 截断每一行
+  return lines.map(line => truncateToWidth(line, tw)).join('\n');
+}
 
-  if (simplifiedLines.length === 1 && simplifiedLines[0].length <= terminalWidth) {
-    return simplifiedOutput;
-  }
-
-  // 最后手段：只显示模型名称和百分比
-  const minimalParts: string[] = [];
-  if (config.display.showModel) {
-    const modelLine = renderModelLine(data, config);
-    if (modelLine) minimalParts.push(modelLine);
-  }
-
-  const contextBar = renderContextBar(data, config);
-  if (contextBar) minimalParts.push(contextBar);
-
-  const minimalOutput = minimalParts.join(' ');
-  if (minimalOutput.length <= terminalWidth) {
-    return minimalOutput;
-  }
-
-  // 如果还是太长，截断
-  return minimalOutput.slice(0, terminalWidth - 3) + '...';
+/**
+ * 预设 main 函数入口（供 index.ts 调用）
+ */
+export function render(data: HudData, config: HudConfig, terminalWidth?: number): string {
+  return renderAdaptiveHud(data, config, terminalWidth);
 }

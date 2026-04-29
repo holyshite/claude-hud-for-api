@@ -10,6 +10,15 @@ import {
 } from './colors';
 
 /**
+ * 格式化 token 数字（K/M 单位）
+ */
+function formatTokens(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(0)}k`;
+  return n.toString();
+}
+
+/**
  * 渲染上下文窗口使用情况
  */
 export function renderContextBar(data: HudData, config: HudConfig): string {
@@ -20,7 +29,7 @@ export function renderContextBar(data: HudData, config: HudConfig): string {
   const { contextPercentage, tokenUsage, contextWindowSize } = data;
   const { safeThreshold, warningThreshold, progressStyle } = config.colors;
   const { percentagePrecision } = config.format;
-  const { compactNumbers } = config.display;
+  const { compactNumbers, contextValue, showTokenBreakdown } = config.display;
 
   const parts: string[] = [];
 
@@ -45,7 +54,7 @@ export function renderContextBar(data: HudData, config: HudConfig): string {
       break;
   }
 
-  // 添加详细信息
+  // 添加上下文数值（根据 contextValue 模式）
   if (contextWindowSize && tokenUsage.totalTokens > 0) {
     const tokensFormatted = compactNumbers
       ? formatCompactNumber(tokenUsage.totalTokens)
@@ -53,7 +62,31 @@ export function renderContextBar(data: HudData, config: HudConfig): string {
     const windowFormatted = compactNumbers
       ? formatCompactNumber(contextWindowSize)
       : contextWindowSize.toString();
-    parts.push(`${tokensFormatted}/${windowFormatted}`);
+
+    switch (contextValue) {
+      case 'tokens':
+        parts.push(`${tokensFormatted}/${windowFormatted}`);
+        break;
+      case 'both':
+        parts.push(`${formatPercentage(contextPercentage, percentagePrecision)} (${tokensFormatted}/${windowFormatted})`);
+        break;
+      case 'remaining': {
+        const remaining = Math.max(0, 100 - contextPercentage);
+        parts.push(`${remaining}%`);
+        break;
+      }
+      case 'percent':
+      default:
+        parts.push(`${tokensFormatted}/${windowFormatted}`);
+        break;
+    }
+  }
+
+  // Token breakdown (in/cache) — 始终显示，不受阈值限制
+  if (showTokenBreakdown && tokenUsage.totalTokens > 0) {
+    const input = formatTokens(tokenUsage.inputTokens);
+    const cache = formatTokens(tokenUsage.cacheCreationTokens + tokenUsage.cacheReadTokens);
+    parts.push(`(in: ${input}, cache: ${cache})`);
   }
 
   return parts.join(' ');

@@ -2,7 +2,7 @@
 
 import { readStdin, extractHudData } from './stdin';
 import { loadConfig } from './config';
-import { renderAdaptiveHud } from './render/index';
+import { render } from './render/index';
 
 /**
  * 主函数
@@ -27,7 +27,7 @@ async function main(): Promise<void> {
 
     // 4. 渲染输出
     const terminalWidth = process.stdout.columns || 80;
-    const output = renderAdaptiveHud(hudData, config, terminalWidth);
+    const output = render(hudData, config, terminalWidth);
 
     // 5. 输出到stdout
     console.log(output);

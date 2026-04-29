@@ -1,4 +1,4 @@
-import type { StdinData, TokenUsage, HudData } from './types';
+import type { StdinData, TokenUsage, HudData, UsageData, SessionTokenUsage } from './types';
 
 type StdinStream = Pick<NodeJS.ReadStream, 'setEncoding' | 'on' | 'off' | 'pause'> & {
   isTTY?: boolean;
@@ -222,6 +222,35 @@ export function getModelName(stdin: StdinData): string {
   return id;
 }
 
+function parseRateLimitPercent(value: unknown): number | null {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return Math.round(Math.min(100, Math.max(0, value)));
+}
+
+function parseRateLimitResetAt(value: unknown): Date | null {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return null;
+  return new Date(value * 1000);
+}
+
+/**
+ * Extract usage data from stdin
+ */
+export function getUsageFromStdin(stdin: StdinData): UsageData | null {
+  const rateLimits = stdin.rate_limits;
+  if (!rateLimits) return null;
+
+  const fiveHour = parseRateLimitPercent(rateLimits.five_hour?.used_percentage);
+  const sevenDay = parseRateLimitPercent(rateLimits.seven_day?.used_percentage);
+  if (fiveHour === null && sevenDay === null) return null;
+
+  return {
+    fiveHour,
+    sevenDay,
+    fiveHourResetAt: parseRateLimitResetAt(rateLimits.five_hour?.resets_at),
+    sevenDayResetAt: parseRateLimitResetAt(rateLimits.seven_day?.resets_at),
+  };
+}
+
 /**
  * Extract and format all HUD data from stdin
  */
@@ -240,6 +269,14 @@ export function extractHudData(stdin: StdinData): HudData {
 
   const hasNativePercentage = stdin.context_window?.used_percentage !== undefined;
 
+  // 提取会话 tokens
+  let sessionTokens: SessionTokenUsage | undefined;
+  // 会话 tokens 来自 transcript 文件
+  // 当前简化处理：使用 current_usage 数据
+
+  // 提取使用量数据
+  const usageData = getUsageFromStdin(stdin);
+
   return {
     modelName,
     modelId: stdin.model?.id,
@@ -247,5 +284,9 @@ export function extractHudData(stdin: StdinData): HudData {
     tokenUsage,
     contextPercentage,
     hasNativePercentage,
+    sessionTokens: undefined,
+    sessionDuration: undefined,
+    gitStatus: undefined,
+    usageData,
   };
 }
