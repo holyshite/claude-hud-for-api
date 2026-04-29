@@ -1,6 +1,6 @@
 {
   "name": "claude-hud",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Claude Code HUD Plugin - Real-time token usage and model information display",
   "main": "dist/index.js",
   "directories": {
