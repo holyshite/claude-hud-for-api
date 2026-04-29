@@ -4,6 +4,7 @@
 
 ![展示效果](pro.png)
 ![展示效果](flash.png)
+![展示效果](pro1.png)
 
 ## 安装
 
@@ -58,9 +59,9 @@ Claude Opus 4.6 | ██████░░░░ 42% (84k/200k) | (in: 45k, cach
 
 ## Slash 命令
 
-| 命令                    | 说明                       |
-| ----------------------- | -------------------------- |
-| `/claude-hud:setup`     | 自动配置状态栏             |
+| 命令                    | 说明                               |
+| ----------------------- | ---------------------------------- |
+| `/claude-hud:setup`     | 自动配置状态栏                     |
 | `/claude-hud:configure` | 查看配置文档，手动编辑 config.json |
 
 ## 配置选项
@@ -69,55 +70,55 @@ Claude Opus 4.6 | ██████░░░░ 42% (84k/200k) | (in: 45k, cach
 
 ### display — 显示控制
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `lineLayout` | string | `"compact"` | 布局模式：`"compact"`（紧凑单行）、`"expanded"`（多行展开）、`"detailed"`（经典详细） |
-| `showSeparators` | boolean | `false` | 各区块之间是否用 `\|` 分隔 |
-| `showModel` | boolean | `true` | 是否显示模型名称 |
-| `showContextBar` | boolean | `true` | 是否显示上下文进度条 |
-| `contextValue` | string | `"percent"` | 上下文数值显示模式：`"percent"`（百分比）、`"tokens"`（绝对数）、`"both"`（百分比+绝对数）、`"remaining"`（剩余百分比） |
-| `showTokenCounts` | boolean | `false` | 是否显示输入/输出/总计 token 详细计数 |
-| `showTokenBreakdown` | boolean | `false` | 是否显示 token 分类（input / cache） |
-| `compactNumbers` | boolean | `true` | 大数字使用 k/M 单位（如 `84k`、`1.2M`） |
-| `showDuration` | boolean | `false` | 是否显示会话时长 |
-| `showSpeed` | boolean | `false` | 是否显示 token 生成速率 |
-| `showUsage` | boolean | `false` | 是否显示 API 速率限制（5 小时 / 7 天） |
-| `usageBarEnabled` | boolean | `true` | 速率限制是否以进度条形式展示 |
-| `usageThreshold` | number | `0` | 速率限制警告阈值（百分比），超过后变色提醒 |
-| `showSessionTokens` | boolean | `false` | 是否显示当前会话累计 token |
-| `showSessionName` | boolean | `false` | 是否显示会话名称 |
-| `showTools` | boolean | `false` | 是否显示当前使用的工具 |
-| `showAgents` | boolean | `false` | 是否显示当前运行的 agent |
-| `showTodos` | boolean | `false` | 是否显示待办事项进度 |
-| `showProject` | boolean | `false` | 是否显示项目名称 |
-| `showConfigCounts` | boolean | `false` | 是否显示配置统计 |
-| `customLine` | string | `""` | 自定义附加文本（最长 80 字符） |
-| `environmentThreshold` | number | `0` | 环境信息警告阈值 |
+| 字段                   | 类型    | 默认值      | 说明                                                                                                                    |
+| ---------------------- | ------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `lineLayout`           | string  | `"compact"` | 布局模式：`"compact"`（紧凑单行）、`"expanded"`（多行展开）、`"detailed"`（经典详细）                                   |
+| `showSeparators`       | boolean | `false`     | 各区块之间是否用 `\|` 分隔                                                                                              |
+| `showModel`            | boolean | `true`      | 是否显示模型名称                                                                                                        |
+| `showContextBar`       | boolean | `true`      | 是否显示上下文进度条                                                                                                    |
+| `contextValue`         | string  | `"percent"` | 上下文数值显示模式：`"percent"`（百分比）、`"tokens"`（绝对数）、`"both"`（百分比+绝对数）、`"remaining"`（剩余百分比） |
+| `showTokenCounts`      | boolean | `false`     | 是否显示输入/输出/总计 token 详细计数                                                                                   |
+| `showTokenBreakdown`   | boolean | `false`     | 是否显示 token 分类（input / cache）                                                                                    |
+| `compactNumbers`       | boolean | `true`      | 大数字使用 k/M 单位（如 `84k`、`1.2M`）                                                                                 |
+| `showDuration`         | boolean | `false`     | 是否显示会话时长                                                                                                        |
+| `showSpeed`            | boolean | `false`     | 是否显示 token 生成速率                                                                                                 |
+| `showUsage`            | boolean | `false`     | 是否显示 API 速率限制（5 小时 / 7 天）                                                                                  |
+| `usageBarEnabled`      | boolean | `true`      | 速率限制是否以进度条形式展示                                                                                            |
+| `usageThreshold`       | number  | `0`         | 速率限制警告阈值（百分比），超过后变色提醒                                                                              |
+| `showSessionTokens`    | boolean | `false`     | 是否显示当前会话累计 token                                                                                              |
+| `showSessionName`      | boolean | `false`     | 是否显示会话名称                                                                                                        |
+| `showTools`            | boolean | `false`     | 是否显示当前使用的工具                                                                                                  |
+| `showAgents`           | boolean | `false`     | 是否显示当前运行的 agent                                                                                                |
+| `showTodos`            | boolean | `false`     | 是否显示待办事项进度                                                                                                    |
+| `showProject`          | boolean | `false`     | 是否显示项目名称                                                                                                        |
+| `showConfigCounts`     | boolean | `false`     | 是否显示配置统计                                                                                                        |
+| `customLine`           | string  | `""`        | 自定义附加文本（最长 80 字符）                                                                                          |
+| `environmentThreshold` | number  | `0`         | 环境信息警告阈值                                                                                                        |
 
 ### gitStatus — Git 状态
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `enabled` | boolean | `false` | 是否启用 Git 状态显示 |
-| `showDirty` | boolean | `false` | 是否显示工作区脏标记 |
-| `showAheadBehind` | boolean | `false` | 是否显示 ahead/behind 提交数 |
-| `showFileStats` | boolean | `false` | 是否显示文件变更统计（M/A/D/U） |
+| 字段              | 类型    | 默认值  | 说明                            |
+| ----------------- | ------- | ------- | ------------------------------- |
+| `enabled`         | boolean | `false` | 是否启用 Git 状态显示           |
+| `showDirty`       | boolean | `false` | 是否显示工作区脏标记            |
+| `showAheadBehind` | boolean | `false` | 是否显示 ahead/behind 提交数    |
+| `showFileStats`   | boolean | `false` | 是否显示文件变更统计（M/A/D/U） |
 
 ### colors — 颜色配置
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `safeThreshold` | number | `70` | 安全阈值（百分比），低于此值进度条为绿色 |
-| `warningThreshold` | number | `90` | 警告阈值（百分比），高于此值进度条为红色 |
-| `modelColor` | string | `"cyan"` | 模型名称颜色，可选 `"green"` `"yellow"` `"red"` `"cyan"` `"blue"` `"magenta"` `"dim"` |
-| `progressStyle` | string | `"bar"` | 进度条样式：`"bar"`（条形 `████`）、`"text"`（纯文本）、`"percentage"`（仅百分比） |
+| 字段               | 类型   | 默认值   | 说明                                                                                  |
+| ------------------ | ------ | -------- | ------------------------------------------------------------------------------------- |
+| `safeThreshold`    | number | `70`     | 安全阈值（百分比），低于此值进度条为绿色                                              |
+| `warningThreshold` | number | `90`     | 警告阈值（百分比），高于此值进度条为红色                                              |
+| `modelColor`       | string | `"cyan"` | 模型名称颜色，可选 `"green"` `"yellow"` `"red"` `"cyan"` `"blue"` `"magenta"` `"dim"` |
+| `progressStyle`    | string | `"bar"`  | 进度条样式：`"bar"`（条形 `████`）、`"text"`（纯文本）、`"percentage"`（仅百分比）    |
 
 ### format — 格式配置
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `modelFormat` | string | `"{name}"` | 模型名称格式，支持 `{name}`（显示名）、`{id}`（模型 ID） |
-| `percentagePrecision` | number | `0` | 百分比小数位数（0–3） |
+| 字段                  | 类型   | 默认值     | 说明                                                     |
+| --------------------- | ------ | ---------- | -------------------------------------------------------- |
+| `modelFormat`         | string | `"{name}"` | 模型名称格式，支持 `{name}`（显示名）、`{id}`（模型 ID） |
+| `percentagePrecision` | number | `0`        | 百分比小数位数（0–3）                                    |
 
 ## 常见显示模式
 
