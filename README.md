@@ -8,14 +8,19 @@
 
 ### 方式一：插件安装（推荐）
 
-在 Claude Code 中运行以下命令：
+在 Claude Code 中依次运行以下命令：
 
-```
-/plugin marketplace add holyshite/claude-hud-for-api
-/plugin install claude-hud
-/reload-plugins
-/claude-hud:setup
-```
+Step 1: 添加插件市场
+`/plugin marketplace add holyshite/claude-hud-for-api`
+
+Step 2: 安装插件
+`/plugin install claude-hud`
+
+Step 3: 重新加载插件
+`/reload-plugins`
+
+Step 4: 自动配置状态栏
+`/claude-hud:setup`
 
 `/claude-hud:setup` 会自动检测 node 路径和插件位置，配置状态栏。完成后重启 Claude Code 即可看到效果。
 
