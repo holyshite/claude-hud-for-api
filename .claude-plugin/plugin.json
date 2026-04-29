@@ -1,23 +1,21 @@
 {
-  "name": "claude-token-hud",
-  "displayName": "Claude Token HUD",
-  "description": "Real-time token usage and model information HUD for Claude Code",
-  "version": "0.1.0",
+  "name": "claude-hud",
+  "displayName": "Claude HUD",
+  "description": "Real-time token usage and model information in the Claude Code status bar",
+  "version": "1.0.0",
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
+    "name": "holyshite"
   },
   "commands": [
     "./commands/setup.md",
     "./commands/configure.md"
   ],
-  "homepage": "https://github.com/yourname/claude-token-hud",
-  "repository": "https://github.com/yourname/claude-token-hud",
+  "homepage": "https://github.com/holyshite/claude-hud-for-api",
+  "repository": "https://github.com/holyshite/claude-hud-for-api",
   "license": "MIT",
-  "keywords": ["hud", "tokens", "monitoring", "statusline", "claude"],
+  "keywords": ["hud", "tokens", "monitoring", "statusline"],
   "categories": ["monitoring", "ui"],
   "engines": {
     "claude-code": ">=2.1.0"
-  },
-  "main": "./dist/index.js"
+  }
 }

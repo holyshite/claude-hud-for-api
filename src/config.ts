@@ -63,7 +63,7 @@ export function setPluginDir(dir: string | null): void {
 export function getPluginDir(): string {
   if (_pluginDir) return _pluginDir;
   const homeDir = os.homedir();
-  return path.join(homeDir, '.claude', 'plugins', 'claude-token-hud');
+  return path.join(homeDir, '.claude', 'plugins', 'claude-hud');
 }
 
 /**

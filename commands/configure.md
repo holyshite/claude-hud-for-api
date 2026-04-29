@@ -6,7 +6,7 @@
 
 插件配置文件位于：
 ```
-~/.claude/plugins/claude-token-hud/config.json
+~/.claude/plugins/claude-hud/config.json
 ```
 
 ## 配置选项
@@ -179,10 +179,10 @@ node configure.js
 
 ```bash
 # 编辑配置文件
-nano ~/.claude/plugins/claude-token-hud/config.json
+nano ~/.claude/plugins/claude-hud/config.json
 
 # 或者使用您喜欢的编辑器
-code ~/.claude/plugins/claude-token-hud/config.json
+code ~/.claude/plugins/claude-hud/config.json
 ```
 
 编辑后，保存文件并重启Claude Code即可生效。
@@ -192,7 +192,7 @@ code ~/.claude/plugins/claude-token-hud/config.json
 要恢复默认配置，只需删除配置文件：
 
 ```bash
-rm ~/.claude/plugins/claude-token-hud/config.json
+rm ~/.claude/plugins/claude-hud/config.json
 ```
 
 重启Claude Code后，插件会自动创建新的默认配置文件。
