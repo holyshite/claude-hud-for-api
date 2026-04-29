@@ -33,12 +33,19 @@ export function renderContextBar(data: HudData, config: HudConfig): string {
 
   const parts: string[] = [];
 
+  // both/remaining 模式下百分比由后续 contextValue 逻辑提供，进度条不再附带
+  const skipBarPercent = contextValue === 'both' || contextValue === 'remaining';
+
   // 根据样式选择渲染方式
   switch (progressStyle) {
     case 'bar':
       const bar = renderProgressBar(contextPercentage, 10, safeThreshold, warningThreshold);
-      const pctColor = getContextColor(contextPercentage, safeThreshold, warningThreshold);
-      parts.push(`${bar} ${colorize(formatPercentage(contextPercentage, percentagePrecision), pctColor)}`);
+      if (skipBarPercent) {
+        parts.push(bar);
+      } else {
+        const pctColor = getContextColor(contextPercentage, safeThreshold, warningThreshold);
+        parts.push(`${bar} ${colorize(formatPercentage(contextPercentage, percentagePrecision), pctColor)}`);
+      }
       break;
 
     case 'text':
@@ -48,9 +55,11 @@ export function renderContextBar(data: HudData, config: HudConfig): string {
 
     case 'percentage':
     default:
-      const percentage = formatPercentage(contextPercentage, percentagePrecision);
-      const color = getContextColor(contextPercentage, safeThreshold, warningThreshold);
-      parts.push(colorize(percentage, color));
+      if (!skipBarPercent) {
+        const percentage = formatPercentage(contextPercentage, percentagePrecision);
+        const color = getContextColor(contextPercentage, safeThreshold, warningThreshold);
+        parts.push(colorize(percentage, color));
+      }
       break;
   }
 

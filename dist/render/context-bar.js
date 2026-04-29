@@ -18,11 +18,17 @@ function renderContextBar(data, config) {
     const { percentagePrecision } = config.format;
     const { compactNumbers, contextValue, showTokenBreakdown } = config.display;
     const parts = [];
+    const skipBarPercent = contextValue === 'both' || contextValue === 'remaining';
     switch (progressStyle) {
         case 'bar':
             const bar = (0, colors_1.renderProgressBar)(contextPercentage, 10, safeThreshold, warningThreshold);
-            const pctColor = (0, colors_1.getContextColor)(contextPercentage, safeThreshold, warningThreshold);
-            parts.push(`${bar} ${(0, colors_1.colorize)((0, colors_1.formatPercentage)(contextPercentage, percentagePrecision), pctColor)}`);
+            if (skipBarPercent) {
+                parts.push(bar);
+            }
+            else {
+                const pctColor = (0, colors_1.getContextColor)(contextPercentage, safeThreshold, warningThreshold);
+                parts.push(`${bar} ${(0, colors_1.colorize)((0, colors_1.formatPercentage)(contextPercentage, percentagePrecision), pctColor)}`);
+            }
             break;
         case 'text':
             const textProgress = (0, colors_1.renderTextProgress)(contextPercentage, safeThreshold, warningThreshold);
@@ -30,9 +36,11 @@ function renderContextBar(data, config) {
             break;
         case 'percentage':
         default:
-            const percentage = (0, colors_1.formatPercentage)(contextPercentage, percentagePrecision);
-            const color = (0, colors_1.getContextColor)(contextPercentage, safeThreshold, warningThreshold);
-            parts.push((0, colors_1.colorize)(percentage, color));
+            if (!skipBarPercent) {
+                const percentage = (0, colors_1.formatPercentage)(contextPercentage, percentagePrecision);
+                const color = (0, colors_1.getContextColor)(contextPercentage, safeThreshold, warningThreshold);
+                parts.push((0, colors_1.colorize)(percentage, color));
+            }
             break;
     }
     if (contextWindowSize && tokenUsage.totalTokens > 0) {
