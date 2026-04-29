@@ -8,48 +8,29 @@
 
 ## 安装
 
-### 方式一：插件安装（推荐）
-
 在 Claude Code 中依次运行以下命令：
 
-Step 1: 添加插件市场
-`/plugin marketplace add holyshite/claude-hud-for-api`
+**Step 1: 添加插件市场**
+```bash
+/plugin marketplace add holyshite/claude-hud-for-api
+```
 
-Step 2: 安装插件
-`/plugin install claude-hud`
+**Step 2: 安装插件**
+```bash
+/plugin install claude-hud
+```
 
-Step 3: 重新加载插件
-`/reload-plugins`
+**Step 3: 重新加载插件**
+```bash
+/reload-plugins
+```
 
-Step 4: 自动配置状态栏
-`/claude-hud:setup`
+**Step 4: 自动配置状态栏**
+```bash
+/claude-hud:setup
+```
 
 `/claude-hud:setup` 会自动检测 node 路径和插件位置，配置状态栏。完成后重启 Claude Code 即可看到效果。
-
-### 方式二：手动安装
-
-如果你更喜欢手动控制：
-
-```bash
-git clone https://github.com/holyshite/claude-hud-for-api.git
-cd claude-hud-for-api
-```
-
-插件已预编译在 `dist/` 目录，无需 `npm install`。直接配置 Claude Code：
-
-编辑 `~/.claude/settings.json`，添加：
-
-```json
-{
-  "statusLine": {
-    "type": "command",
-    "command": "node /path/to/claude-hud-for-api/dist/index.js",
-    "padding": 1
-  }
-}
-```
-
-> 将 `/path/to/` 替换为实际路径。也支持 `~/.claude/plugins/claude-hud/` 等目录。
 
 ## 显示效果
 
@@ -63,6 +44,25 @@ Claude Opus 4.6 | ██████░░░░ 42% (84k/200k) | (in: 45k, cach
 | ----------------------- | ---------------------------------- |
 | `/claude-hud:setup`     | 自动配置状态栏                     |
 | `/claude-hud:configure` | 查看配置文档，手动编辑 config.json |
+
+## 更新
+
+**Step 1: 刷新插件市场**
+```bash
+/plugin marketplace update claude-hud-marketplace
+```
+
+**Step 2: 更新插件**
+```bash
+/plugin update claude-hud@claude-hud-marketplace
+```
+
+**Step 3: 重新加载插件**
+```bash
+/reload-plugins
+```
+
+更新后如果状态栏未生效，重新运行 `/claude-hud:setup` 即可。
 
 ## 配置选项
 
