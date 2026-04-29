@@ -53,7 +53,7 @@ cd claude-hud-for-api
 ## 显示效果
 
 ```
-Claude Opus 4.6 | ██████░░░░ 42% 84k/200k
+Claude Opus 4.6 | ██████░░░░ 42% (84k/200k) | (in: 45k, cache: 3k)
 ```
 
 ## Slash 命令
@@ -67,40 +67,92 @@ Claude Opus 4.6 | ██████░░░░ 42% 84k/200k
 
 配置保存在 `~/.claude/plugins/claude-hud/config.json`（首次运行自动创建）。
 
-### 完整配置项
+### display — 显示控制
 
-| 字段 | 类型 | 默认值 | 说明 | 可选值 |
-|------|------|--------|------|--------|
-| `display.layout` | string | `"compact"` | 布局模式 | `"compact"`（紧凑单行）、`"detailed"`（详细多行） |
-| `display.showModel` | boolean | `true` | 是否显示模型名称 | `true` / `false` |
-| `display.showContextBar` | boolean | `true` | 是否显示上下文进度条 | `true` / `false` |
-| `display.showTokenCounts` | boolean | `false` | 是否显示输入/输出详细 token 计数 | `true` / `false` |
-| `display.showSeparators` | boolean | `true` | 是否显示分隔符（`\|`） | `true` / `false` |
-| `display.compactNumbers` | boolean | `true` | 大数字使用 k/M 单位（如 `84k`） | `true` / `false` |
-| `colors.safeThreshold` | number | `70` | 安全阈值（百分比），低于此值进度条为绿色 | `0`–`100` |
-| `colors.warningThreshold` | number | `90` | 警告阈值（百分比），高于此值进度条为红色 | `0`–`100` |
-| `colors.modelColor` | string | `"cyan"` | 模型名称颜色 | `"green"`、`"yellow"`、`"red"`、`"cyan"`、`"blue"`、`"magenta"`、`"dim"` |
-| `colors.progressStyle` | string | `"bar"` | 进度条样式 | `"bar"`（条形 `████`）、`"text"`（纯文本）、`"percentage"`（仅百分比） |
-| `format.modelFormat` | string | `"{name}"` | 模型名称显示格式，支持占位符 | `"{name}"`（显示名）、`"{id}"`（模型 ID）、可组合如 `"{name} ({id})"` |
-| `format.percentagePrecision` | number | `0` | 百分比小数位数 | `0`–`3` |
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `lineLayout` | string | `"compact"` | 布局模式：`"compact"`（紧凑单行）、`"expanded"`（多行展开）、`"detailed"`（经典详细） |
+| `showSeparators` | boolean | `false` | 各区块之间是否用 `\|` 分隔 |
+| `showModel` | boolean | `true` | 是否显示模型名称 |
+| `showContextBar` | boolean | `true` | 是否显示上下文进度条 |
+| `contextValue` | string | `"percent"` | 上下文数值显示模式：`"percent"`（百分比）、`"tokens"`（绝对数）、`"both"`（百分比+绝对数）、`"remaining"`（剩余百分比） |
+| `showTokenCounts` | boolean | `false` | 是否显示输入/输出/总计 token 详细计数 |
+| `showTokenBreakdown` | boolean | `false` | 是否显示 token 分类（input / cache） |
+| `compactNumbers` | boolean | `true` | 大数字使用 k/M 单位（如 `84k`、`1.2M`） |
+| `showDuration` | boolean | `false` | 是否显示会话时长 |
+| `showSpeed` | boolean | `false` | 是否显示 token 生成速率 |
+| `showUsage` | boolean | `false` | 是否显示 API 速率限制（5 小时 / 7 天） |
+| `usageBarEnabled` | boolean | `true` | 速率限制是否以进度条形式展示 |
+| `usageThreshold` | number | `0` | 速率限制警告阈值（百分比），超过后变色提醒 |
+| `showSessionTokens` | boolean | `false` | 是否显示当前会话累计 token |
+| `showSessionName` | boolean | `false` | 是否显示会话名称 |
+| `showTools` | boolean | `false` | 是否显示当前使用的工具 |
+| `showAgents` | boolean | `false` | 是否显示当前运行的 agent |
+| `showTodos` | boolean | `false` | 是否显示待办事项进度 |
+| `showProject` | boolean | `false` | 是否显示项目名称 |
+| `showConfigCounts` | boolean | `false` | 是否显示配置统计 |
+| `customLine` | string | `""` | 自定义附加文本（最长 80 字符） |
+| `environmentThreshold` | number | `0` | 环境信息警告阈值 |
+
+### gitStatus — Git 状态
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `enabled` | boolean | `false` | 是否启用 Git 状态显示 |
+| `showDirty` | boolean | `false` | 是否显示工作区脏标记 |
+| `showAheadBehind` | boolean | `false` | 是否显示 ahead/behind 提交数 |
+| `showFileStats` | boolean | `false` | 是否显示文件变更统计（M/A/D/U） |
+
+### colors — 颜色配置
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `safeThreshold` | number | `70` | 安全阈值（百分比），低于此值进度条为绿色 |
+| `warningThreshold` | number | `90` | 警告阈值（百分比），高于此值进度条为红色 |
+| `modelColor` | string | `"cyan"` | 模型名称颜色，可选 `"green"` `"yellow"` `"red"` `"cyan"` `"blue"` `"magenta"` `"dim"` |
+| `progressStyle` | string | `"bar"` | 进度条样式：`"bar"`（条形 `████`）、`"text"`（纯文本）、`"percentage"`（仅百分比） |
+
+### format — 格式配置
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `modelFormat` | string | `"{name}"` | 模型名称格式，支持 `{name}`（显示名）、`{id}`（模型 ID） |
+| `percentagePrecision` | number | `0` | 百分比小数位数（0–3） |
 
 ## 常见显示模式
 
 **紧凑模式（默认）**
 ```
-Claude Opus 4.6 | ██████░░░░ 42% 84k/200k
+Claude Opus 4.6 ██████░░░░ 42% (84k/200k)
 ```
 
-**详细模式**
+**显示 token 分解**
+```
+Claude Opus 4.6 ██████░░░░ 42% (84k/200k) (in: 45k, cache: 3k)
+```
+
+**显示速率限制**
+```
+Claude Opus 4.6 ██████░░░░ 42% (84k/200k) | API: ████░░ 67%
+```
+
+**展开模式（`lineLayout: "expanded"`）**
+```
+Claude Opus 4.6
+██████░░░░ 42% (84k/200k)
+usage: 67%
+```
+
+**详细模式（`lineLayout: "detailed"`）**
 ```
 Claude Opus 4.6
 ██████░░░░ 42% 84k/200k
 In: 45k | Out: 39k | Total: 84k
 ```
 
-**启用 token 计数**
+**启用 token 计数 + 分解**
 ```
-Claude Opus 4.6 | ██████░░░░ 42% 84k/200k | In: 45k | Out: 39k | Total: 84k
+Claude Opus 4.6 ██████░░░░ 42% (84k/200k) (in: 45k, cache: 3k) In: 45k | Out: 39k | Total: 84k
 ```
 
 ## 技术栈
@@ -176,6 +228,10 @@ echo '{"model":{"display_name":"Claude Opus 4.6"},"context_window":{"context_win
 4. **终端颜色问题**
    - 检查终端 ANSI 颜色支持
    - 使用 `dim` 颜色或禁用颜色
+
+5. **配置项不生效**
+   - v1.1 起 `display.layout` 已更名为 `display.lineLayout`，如果 config.json 中仍使用旧字段名，会自动迁移
+   - 旧值 `"separators"` 会自动转为 `lineLayout: "compact"` + `showSeparators: true`
 
 ## 许可证
 
