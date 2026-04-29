@@ -44,7 +44,7 @@ Claude Opus 4.6 | ██████░░░░ 42% (84k/200k) | (in: 45k, cach
 | 命令                    | 说明                               |
 | ----------------------- | ---------------------------------- |
 | `/claude-hud:setup`     | 自动配置状态栏                     |
-| `/claude-hud:configure` | 查看配置文档，手动编辑 config.json |
+| `/claude-hud:configure` | 交互式配置显示选项、颜色、格式和 Git 状态 |
 
 ## 更新
 
