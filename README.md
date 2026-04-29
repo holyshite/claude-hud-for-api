@@ -5,6 +5,7 @@
 ![展示效果](pro.png)
 ![展示效果](flash.png)
 ![展示效果](pro1.png)
+![展示效果](pro2.png)
 
 ## 安装
 
