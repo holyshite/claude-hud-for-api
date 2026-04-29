@@ -1,3 +1,8 @@
+---
+description: 自动配置 Claude Code 状态栏，检测 node 路径和插件位置
+allowed-tools: Read, Write, Bash
+---
+
 # Claude HUD Setup
 
 自动配置 Claude Code 状态栏，显示实时 token 使用量和模型信息。
@@ -77,7 +82,7 @@ Expected output: something like `Claude Test | ██░░░░░░░░ 23
 ## 可用的 slash 命令
 
 - `/claude-hud:setup` - 自动配置状态栏（当前命令）
-- `/claude-hud:configure` - 自定义显示选项、颜色、格式
+- `/claude-hud:configure` - 查看并编辑 HUD 显示选项、颜色和格式配置
 
 ## 故障排除
 

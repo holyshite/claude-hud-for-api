@@ -61,50 +61,28 @@ Claude Opus 4.6 | ██████░░░░ 42% 84k/200k
 | 命令                    | 说明                       |
 | ----------------------- | -------------------------- |
 | `/claude-hud:setup`     | 自动配置状态栏             |
-| `/claude-hud:configure` | 自定义显示选项、颜色、格式 |
+| `/claude-hud:configure` | 查看配置文档，手动编辑 config.json |
 
 ## 配置选项
 
 配置保存在 `~/.claude/plugins/claude-hud/config.json`（首次运行自动创建）。
 
-### 显示设置
+### 完整配置项
 
-```json
-{
-  "display": {
-    "layout": "compact",
-    "showModel": true,
-    "showContextBar": true,
-    "showTokenCounts": false,
-    "showSeparators": true,
-    "compactNumbers": true
-  }
-}
-```
-
-### 颜色设置
-
-```json
-{
-  "colors": {
-    "safeThreshold": 70,
-    "warningThreshold": 90,
-    "modelColor": "cyan",
-    "progressStyle": "bar"
-  }
-}
-```
-
-### 格式设置
-
-```json
-{
-  "format": {
-    "modelFormat": "{name}",
-    "percentagePrecision": 0
-  }
-}
-```
+| 字段 | 类型 | 默认值 | 说明 | 可选值 |
+|------|------|--------|------|--------|
+| `display.layout` | string | `"compact"` | 布局模式 | `"compact"`（紧凑单行）、`"detailed"`（详细多行） |
+| `display.showModel` | boolean | `true` | 是否显示模型名称 | `true` / `false` |
+| `display.showContextBar` | boolean | `true` | 是否显示上下文进度条 | `true` / `false` |
+| `display.showTokenCounts` | boolean | `false` | 是否显示输入/输出详细 token 计数 | `true` / `false` |
+| `display.showSeparators` | boolean | `true` | 是否显示分隔符（`\|`） | `true` / `false` |
+| `display.compactNumbers` | boolean | `true` | 大数字使用 k/M 单位（如 `84k`） | `true` / `false` |
+| `colors.safeThreshold` | number | `70` | 安全阈值（百分比），低于此值进度条为绿色 | `0`–`100` |
+| `colors.warningThreshold` | number | `90` | 警告阈值（百分比），高于此值进度条为红色 | `0`–`100` |
+| `colors.modelColor` | string | `"cyan"` | 模型名称颜色 | `"green"`、`"yellow"`、`"red"`、`"cyan"`、`"blue"`、`"magenta"`、`"dim"` |
+| `colors.progressStyle` | string | `"bar"` | 进度条样式 | `"bar"`（条形 `████`）、`"text"`（纯文本）、`"percentage"`（仅百分比） |
+| `format.modelFormat` | string | `"{name}"` | 模型名称显示格式，支持占位符 | `"{name}"`（显示名）、`"{id}"`（模型 ID）、可组合如 `"{name} ({id})"` |
+| `format.percentagePrecision` | number | `0` | 百分比小数位数 | `0`–`3` |
 
 ## 常见显示模式
 
@@ -154,10 +132,15 @@ claude-hud-for-api/
 │       └── validation.ts
 ├── commands/                     # Slash 命令
 │   ├── setup.md
-│   ├── configure.md
-│   └── test.md
+│   └── configure.md
 ├── dist/                         # 编译输出（已提交，开箱即用）
-├── tests/                        # 测试文件
+├── tests/                        # 测试文件（单元测试 + 手动测试指南）
+│   ├── config.test.ts
+│   ├── render.test.ts
+│   ├── stdin.test.ts
+│   ├── validation.test.ts
+│   ├── setup.ts
+│   └── manual-test.md
 ├── package.json
 └── tsconfig.json
 ```

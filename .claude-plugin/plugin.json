@@ -6,10 +6,7 @@
   "author": {
     "name": "holyshite"
   },
-  "commands": [
-    "./commands/setup.md",
-    "./commands/configure.md"
-  ],
+  "commands": ["./commands"],
   "homepage": "https://github.com/holyshite/claude-hud-for-api",
   "repository": "https://github.com/holyshite/claude-hud-for-api",
   "license": "MIT",
